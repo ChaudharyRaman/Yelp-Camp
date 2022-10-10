@@ -1,0 +1,10 @@
+    <% layout('./layouts/boilerplate.ejs') %>
+    <h1>ALL CAMPGROUNDS</h1>
+    <div>
+        <a href="/campgrounds/new">ADD Campground</a>
+    </div>
+    <ul>
+        <% for(let campground of campgrounds) {%>
+            <li><a href="/campgrounds/<%= campground._id %>"><%= campground.title %></a> </li>    
+        <% } %>  
+    </ul>
