@@ -1,4 +1,3 @@
-const access_key = 'xiGhjaUo8usOem_o0gKwjxfvr6BWP1ou_sFAg0hkKBI';
 const mongoose = require('mongoose');
 // MODEL REF
 // const Campground = require('./models/campground');
