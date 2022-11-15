@@ -70,6 +70,7 @@ const validateCampground = (req, res, next) => {
       const newCampground = new Campground(req.body.campground);
       await newCampground.save();
       // res.redirect('/campgrounds');
+      req.flash('success','Successfully made a new campGround');
       res.redirect(`/campgrounds/${newCampground._id}`);
     // }catch(e){
       // next(e);
@@ -81,6 +82,11 @@ const validateCampground = (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findById(id).populate('reviews');
     // console.log(campground);
+
+    if(!campground){
+      req.flash('error','Cannot find that campground');
+      return res.redirect('/campgrounds');
+    }
     res.render("campgrounds/show", { campground });
   }));
   
@@ -108,7 +114,7 @@ const validateCampground = (req, res, next) => {
   router.get("/:id/edit", catchAsync(async (req, res) => {
     // console.log(req.params.id);
     const campground = await Campground.findById(req.params.id);
-    console.log(campground);
+    // console.log(campground);
     res.render("campgrounds/edit", { campground });
   }));
   

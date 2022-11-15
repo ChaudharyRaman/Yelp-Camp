@@ -10,6 +10,11 @@ const ExpressError = require("./utils/ExpressError");
 
 const mongoose = require("mongoose");
 
+// sessions
+const session = require('express-session');
+// Flash
+const flash = require('connect-flash');
+
 // JOI
 const Joi = require("joi");
 const { campgroundSchema, reviewSchema } = require("./schemas.js");
@@ -22,6 +27,7 @@ const review = require("./models/review");
 // ROUTER
 const campgrounds = require("./routes/campgrounds");
 const reviews = require("./routes/reviews");
+const { log } = require("console");
 
 // CONECTION WITH MONGOOSE
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
@@ -35,9 +41,24 @@ db.once("open", () => {
 app.engine("ejs", ejs_mate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "./views"));
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "./public")));
+
+const sessionConfig = {
+  secret:'thisshouldbeabettersecret!',
+  resave:false,
+  saveUninitialized:true,
+  cookie:{
+    httpOnly:true,
+    expires:Date.now() + 1000 * 60 *60 *24 *7,
+    maxAge:1000 * 60 *60 *24 *7
+  }
+}
+app.use(session(sessionConfig));
 
 // ERROR MIDDLEWARE
 // method to check for validation in campground
@@ -80,12 +101,22 @@ app.use(methodOverride("_method"));
 //   }
 // };
 
+app.use(flash());
+// FLASH MIDDLEWARE
+app.use((req,res,next)=>{
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    // console.log("HII");
+    next();    
+})
+
 app.use('/campgrounds',campgrounds);
 app.use('/campgrounds/:id/reviews',reviews);
 
 app.get("/", (req, res) => {
   res.render("home");
 });
+
 // ------------------------------------------------------------------------------
 // Campground PREV ROUTES METHOD>>>
 // ------------------------------------------------------------------------------
